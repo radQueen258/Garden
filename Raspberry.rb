@@ -1,41 +1,38 @@
 class Raspberry
 
-  attr_reader :index, :stages
-
-  def self.stages
-    @@stages = ["Absent", "Flowering", "Green", "Red"]
-  end
+  @@stages = ["Absent", "Flowering", "Green", "Red"]
 
   def initialize(index)
-    @index = 0
-    @stages = @@stages[index]
+    @index = index
+    @stages = @@stages[0]
   end
 
   def grow!
-    @index += 1
-    @stages[@index]
+    current_index = @@stages.index(@stages)
+    if current_index < @@stages.length - 1
+      @stages = @@stages[current_index + 1]
+    end
   end
 
-  def ripe? (raspberries)
-    @@stages.index(raspberries.last) == @@stages.index("Red")
-  end
+def ripe?
+  @stages == "Red"
+end
 end
 
-
+#--------------------------------RASPBERRY BUSH-CLASS----------------------------
 class RaspberryBush
 
   def initialize(num_raspberries)
-    Raspberry.stages
     @raspberries =[]
-    num_raspberries.times {@raspberries << Raspberry.new}
+    num_raspberries.times {|i|@raspberries << Raspberry.new(i)}
   end
 
   def grow_all!
-    @raspberries.each(&:grow!)
+    @raspberries.each{|raspberries| raspberries.grow!}
   end
 
   def ripe_all?
-    @raspberries.all?(&:ripe?)
+    @raspberries.all?{|raspberries| raspberries.ripe?}
   end
 
   def give_away_all!
@@ -43,12 +40,13 @@ class RaspberryBush
   end
 end
 
+#----------------------HUMAN CLASS---------------------------------------
 class Human
   attr_accessor :name
 
-  def initialize(name, plant)
+  def initialize(name, raspberry_bush)
     @name = name
-    @plant = plant
+    @plant = raspberry_bush
   end
 
   def work!
@@ -57,43 +55,27 @@ class Human
 
   def harvest
     if @plant.ripe_all?
-      puts "Harvesting time!!"
+      puts "#{@name}, is harvesting time!!"
       @plant.give_away_all!
 
     else
-      puts "It's too early, be patient!"
+      puts "It's too early #{@name}, be patient!"
     end
   end
 
   def self.knowledge_base
     puts "Gardening tip: aspberries are best planted in
     early spring or late fall for optimal growth"
+    puts "Plant raspberries in well-drained soil and full sun."
   end
 end
 
+#-------------------CONSOLE OUTPUT-------------------
 
+bush = RaspberryBush.new(3)
+gardener = Human.new("Radka", bush)
 
-require_relative 'raspberry_bush'
-require_relative 'human'
+Human.knowledge_base
 
-def call_for_help
-  puts "Calling for help with gardening..."
-end
-
-raspberry_bush = RaspberryBush.new(4)
-human = Human.new ("Alice")
-
-human.take_care_of(raspberry_bush)
-
-while !raspberry_bush.ripe?
-  puts "The raspberries are not yet ripe, continuing to care for them..."
-  human.take_care_of(raspberry_bush)
-end
-
-puts "Harvesting..."
-
-harvest = human.harvest(raspberry_bush)
-if harvest.empty?
-  call_for_help
-end
-puts "Harvest #{harvest.size} raspberries"
+  gardener.work!
+  gardener.harvest
