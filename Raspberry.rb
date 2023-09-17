@@ -55,7 +55,7 @@ class Human
 
   def harvest
     if @plant.ripe_all?
-      puts "#{@name}, is harvesting time!!"
+      puts "Congratulations you won!"
       @plant.give_away_all!
 
     else
@@ -72,10 +72,32 @@ end
 
 #-------------------CONSOLE OUTPUT-------------------
 
-bush = RaspberryBush.new(3)
-gardener = Human.new("Radka", bush)
+puts "What is your name ?"
+name = gets.chomp
+gardener = Human.new(name, RaspberryBush.new(50))
 
-Human.knowledge_base
+puts "Okay, #{name}. Here is the backgroud: you have 50 raspberry bushes."
+puts "You can enter: "
+puts "1. To harvest raspberries if they are ripe"
+puts "2. To work and grow your plants"
+puts "3. To know your knowledge base"
+puts " "
 
-  gardener.work!
-  gardener.harvest
+loop do
+  choice = gets.chomp.to_i
+  case choice
+  when 1
+    result = gardener.harvest
+    puts result
+    break if  result == "Congratulations you won!"
+
+  when 2
+    gardener.work!
+    puts "Good job! Keep going! "
+
+    when 3
+      puts Human.knowledge_base
+       else
+        puts "Invalid choice"
+  end
+end
